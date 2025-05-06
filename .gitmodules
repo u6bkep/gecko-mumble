@@ -1,0 +1,6 @@
+[submodule "phpMumbleAdmin-docker"]
+	path = phpMumbleAdmin-docker
+	url = git@github.com:u6bkep/phpMumbleAdmin-docker.git
+[submodule "flaskcvp"]
+	path = flaskcvp
+	url = git@github.com:u6bkep/flaskcvp.git

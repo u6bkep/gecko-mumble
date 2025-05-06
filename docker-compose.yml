@@ -1,0 +1,68 @@
+name: gecko-mumble
+
+services:
+  mumble-server:
+    image: ghcr.io/mumble-voip/mumble-server:v1.5.735-3
+    container_name: mumble-server
+    restart: unless-stopped
+    ports:
+      - 64738:64738
+      - 64738:64738/udp
+      - 64739:64739
+      - 64739:64739/udp
+      - 64740:64740
+      - 64740:64740/udp
+    networks:
+      - default
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mumble-server-data/:/mumble-server-data/
+    environment:
+      - TZ=EST
+    env_file: "mumble-server-config.env" # mumble server ini converted to env file per https://github.com/mumble-voip/mumble-docker
+
+  mumble-php-admin: 
+    image: u6bkep/murmur-php-admin
+    depends_on:
+      - mumble-server
+    build:
+      context: phpMumbleAdmin-docker/
+    container_name: mumble-php-admin
+    restart: unless-stopped
+    ports:
+      - 5002:80
+    networks:
+      - default
+    volumes:
+      - type: volume
+        source: mumble-admin-data
+        target: /var/www/html
+
+  murmur-cvp:
+    image: u6bkep/flaskcvp
+    build:
+      context: flaskcvp/
+      args:
+        - SLICE_NAME=${SLICE_NAME}
+        - MURMUR_CONNECT_URL=${MURMUR_CONNECT_URL}
+    container_name: murmur-cvp
+    restart: unless-stopped
+    depends_on:
+      - mumble-server
+    ports:
+      - 5000:5000
+    networks:
+      - default
+    environment:
+      MUMBLE_CONNSTRING: "Meta -e 1.0:tcp -h mumble-server -p 6502"
+      MUMBLE_ICESECRET: "${MUMBLE_CONFIG_icesecretread}"
+      MUMBLE_SLICE: "${SLICE_NAME}"
+      FLASKCVP_HOST: "::"
+      FLASKCVP_PORT: "5000"
+      MURMUR_CONNECT_URL: "${MURMUR_CONNECT_URL}"
+    env_file: 
+      - "mumble-server-config.env"
+      - .env
+
+volumes:
+  mumble-admin-data:
