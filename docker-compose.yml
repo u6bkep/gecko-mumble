@@ -21,6 +21,21 @@ services:
       - TZ=EST
     env_file: "mumble-server-config.env" # mumble server ini converted to env file per https://github.com/mumble-voip/mumble-docker
 
+# host networking mode for mumble server. used during testing
+  mumble-server-host:
+    profiles:
+        - donotstart
+    image: ghcr.io/mumble-voip/mumble-server:v1.5.735-3
+    container_name: mumble-server-host
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mumble-server-data/:/mumble-server-data/
+    environment:
+      - TZ=EST
+    env_file: "mumble-server-config.env" # mumble server ini converted to env file per https://github.com/mumble-voip/mumble-docker
+
   mumble-php-admin: 
     image: u6bkep/murmur-php-admin
     depends_on:
@@ -38,7 +53,10 @@ services:
         source: mumble-admin-data
         target: /var/www/html
 
+# legacy Channel Viewer Protocol server
   murmur-cvp:
+    profiles:
+      - donotstart
     image: u6bkep/flaskcvp
     build:
       context: flaskcvp/
@@ -63,6 +81,25 @@ services:
     env_file: 
       - "mumble-server-config.env"
       - .env
+
+  channel-push:
+    build:
+      context: channel-push/
+    ports:
+      - "5001:5001"
+    environment:
+      MUMBLE_ICE_HOST: "mumble-server"
+      MUMBLE_ICE_PORT: "6502"
+      MUMBLE_ICE_SECRET: "${MUMBLE_CONFIG_icesecretread}"
+      CVP_ICE_HOST: "channel-push"
+      CVP_HTTP_HOST: "0.0.0.0"
+      CVP_HTTP_PORT: "5001"
+    depends_on:
+      - mumble-server
+    networks:
+      - default
+    env_file: 
+      - "mumble-server-config.env"
 
 volumes:
   mumble-admin-data:

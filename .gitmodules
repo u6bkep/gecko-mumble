@@ -4,3 +4,6 @@
 [submodule "flaskcvp"]
 	path = flaskcvp
 	url = git@github.com:u6bkep/flaskcvp.git
+[submodule "channel-push"]
+	path = channel-push
+	url = /home/ben/Documents/programmingPlay/mumble/channel-push
