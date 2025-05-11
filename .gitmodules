@@ -1,9 +1,9 @@
 [submodule "phpMumbleAdmin-docker"]
 	path = phpMumbleAdmin-docker
-	url = git@github.com:u6bkep/phpMumbleAdmin-docker.git
+	url = https://github.com/u6bkep/phpMumbleAdmin-docker.git
 [submodule "flaskcvp"]
 	path = flaskcvp
-	url = git@github.com:u6bkep/flaskcvp.git
+	url = https://github.com/u6bkep/flaskcvp.git
 [submodule "channel-push"]
 	path = channel-push
-	url = /home/ben/Documents/programmingPlay/mumble/channel-push
+	url = https://github.com/u6bkep/mumble-channel-push.git
