@@ -83,6 +83,7 @@ services:
       - .env
 
   channel-push:
+    image: ghcr.io/u6bkep/mumble-channel-push:master
     build:
       context: channel-push/
     ports:
@@ -94,6 +95,7 @@ services:
       CVP_ICE_HOST: "channel-push"
       CVP_HTTP_HOST: "0.0.0.0"
       CVP_HTTP_PORT: "5001"
+      MUMBLE_LOG_LEVEL: "WARNING"
     depends_on:
       - mumble-server
     networks:
