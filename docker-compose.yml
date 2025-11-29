@@ -12,6 +12,7 @@ services:
       - 64739:64739/udp
       - 64740:64740
       - 64740:64740/udp
+      - "127.0.0.1:6502:6502"
     networks:
       - default
     volumes:
@@ -103,5 +104,20 @@ services:
     env_file: 
       - "mumble-server-config.env"
 
+  link-bot:
+    image: ghcr.io/u6bkep/link-bot:latest
+    volumes:
+      - ./link-bot/links-config.json:/app/links-config.json:ro
+    environment:
+      MUMBLE_ICE_HOST: mumble-server
+      MUMBLE_ICE_PORT: 6502
+      MUMBLE_ICE_SECRET: ${MUMBLE_CONFIG_icesecretread}
+      ICE_CALLBACK_HOST: link-bot
+      ICE_CALLBACK_PORT: 6503
+      LINK_BOT_CONFIG: /app/links-config.json
+      LINK_BOT_LOG_LEVEL: INFO
+      LINK_BOT_MAX_MESSAGE_LENGTH: 5000
+    depends_on:
+      - mumble-server
 volumes:
   mumble-admin-data:

@@ -7,3 +7,6 @@
 [submodule "channel-push"]
 	path = channel-push
 	url = https://github.com/u6bkep/mumble-channel-push.git
+[submodule "link-bot"]
+	path = link-bot
+	url = git@github.com:u6bkep/link-bot.git
