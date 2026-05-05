@@ -96,7 +96,7 @@ services:
       CVP_ICE_HOST: "channel-push"
       CVP_HTTP_HOST: "0.0.0.0"
       CVP_HTTP_PORT: "5001"
-      MUMBLE_LOG_LEVEL: "WARNING"
+      MUMBLE_LOG_LEVEL: "warn"
     depends_on:
       - mumble-server
     networks:
