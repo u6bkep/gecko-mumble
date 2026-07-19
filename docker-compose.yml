@@ -87,8 +87,9 @@ services:
     image: ghcr.io/u6bkep/mumble-channel-push:master
     build:
       context: channel-push/
-    ports:
-      - "5001:5001"
+    # No host port: reached only by Caddy over the internal network, plain HTTP.
+    expose:
+      - "5001"
     environment:
       MUMBLE_ICE_HOST: "mumble-server"
       MUMBLE_ICE_PORT: "6502"
@@ -97,11 +98,22 @@ services:
       CVP_HTTP_HOST: "0.0.0.0"
       CVP_HTTP_PORT: "5001"
       MUMBLE_LOG_LEVEL: "warn"
+      # --- authentication (Authentik OIDC); secrets live in gitignored .env ---
+      CVP_AUTHENTIK_URL: "${CVP_AUTHENTIK_URL}"
+      CVP_OIDC_SLUG: "${CVP_OIDC_SLUG}"
+      CVP_OIDC_CLIENT_ID: "${CVP_OIDC_CLIENT_ID}"
+      CVP_OIDC_CLIENT_SECRET: "${CVP_OIDC_CLIENT_SECRET}"
+      CVP_PUBLIC_URL: "${CVP_PUBLIC_URL}"
+      # CVP_REQUIRED_GROUP: "${CVP_REQUIRED_GROUP}"  # optional: gate access to one group
+      # TLS is terminated by Caddy; the app serves plain HTTP. For standalone
+      # in-app TLS instead, build the image --features tls and set
+      # CVP_TLS_CERT / CVP_TLS_KEY (mounting the certs read-only).
     depends_on:
       - mumble-server
     networks:
-      - default
-    env_file: 
+      - default          # Ice link to mumble-server
+      - proxy            # shared external net; Caddy (in /containers/caddy) reaches this over it
+    env_file:
       - "mumble-server-config.env"
 
   link-bot:
@@ -121,3 +133,9 @@ services:
       - mumble-server
 volumes:
   mumble-admin-data:
+
+networks:
+  # Created once on the host: `docker network create proxy`.
+  # Shared with the standalone Caddy stack in /containers/caddy.
+  proxy:
+    external: true
