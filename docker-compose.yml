@@ -46,7 +46,7 @@ services:
     container_name: mumble-php-admin
     restart: unless-stopped
     ports:
-      - 5002:80
+      - "10.0.0.2:5002:80"
     networks:
       - default
     volumes:
@@ -85,6 +85,7 @@ services:
 
   channel-push:
     image: ghcr.io/u6bkep/mumble-channel-push:master
+    restart: unless-stopped
     build:
       context: channel-push/
     # No host port: reached only by Caddy over the internal network, plain HTTP.
@@ -118,6 +119,7 @@ services:
 
   link-bot:
     image: ghcr.io/u6bkep/link-bot:latest
+    restart: unless-stopped
     volumes:
       - ./link-bot/links-config.json:/app/links-config.json:ro
     environment:
